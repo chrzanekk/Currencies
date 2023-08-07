@@ -1,15 +1,14 @@
 package pl.konradchrzanowski.currencies.domain;
 
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "currencies-requests")
+@Table(name = "currencies_requests")
 public class Currency {
 
     @Id
@@ -17,16 +16,15 @@ public class Currency {
     private Long id;
 
     @Column(name = "name")
-    @NotNull
     private String name;
 
-    @Column(name = "currency")
+    @Column(name = "currency_code")
     private String currency;
 
     @Column(name = "request_date")
-    LocalDateTime date;
+    private LocalDateTime date;
 
-    @Column(name = "value")
-    BigDecimal value;
+    @Column(name = "currency_value")
+    private BigDecimal value;
 
 }

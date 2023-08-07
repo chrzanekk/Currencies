@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/currencies/")
+@RequestMapping(path = "/currencies")
 public class CurrencyController {
 
     private final Logger log = LoggerFactory.getLogger(CurrencyController.class);
@@ -27,7 +27,7 @@ public class CurrencyController {
     }
 
 
-    @PostMapping(name = "get-current-currency-value-command")
+    @PostMapping(path = "/get-current-currency-value-command")
     public ResponseEntity<CurrencyValueResponse> getCurrentCurrencyValue(@RequestBody CurrencyRequest currencyRequest) {
         log.debug("REST request to get current currency value: {}", currencyRequest.getCurrency());
         CurrencyDTO result = currencyService.getCurrentCurrencyValue(currencyRequest);
@@ -36,7 +36,7 @@ public class CurrencyController {
     }
 
 
-    @GetMapping(name = "requests")
+    @GetMapping(path = "/requests")
     public ResponseEntity<List<CurrencyResponse>> getAllRequests() {
         log.debug("REST get all currencies requests");
         List<CurrencyDTO> result = currencyService.getAllSavedRequests();

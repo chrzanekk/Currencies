@@ -1,12 +1,15 @@
 package pl.konradchrzanowski.currencies.payload;
 
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Builder
-@Data
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CurrencyValueResponse {
-    private final BigDecimal value;
+    @JsonProperty("value")
+    private BigDecimal value;
 }
