@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(name = "currencies-requests")
 public class Currency {
 
     @Id
@@ -20,14 +21,12 @@ public class Currency {
     private String name;
 
     @Column(name = "currency")
-    @NotNull
     private String currency;
 
     @Column(name = "request_date")
     LocalDateTime date;
 
     @Column(name = "value")
-    @NotNull
     BigDecimal value;
 
 }

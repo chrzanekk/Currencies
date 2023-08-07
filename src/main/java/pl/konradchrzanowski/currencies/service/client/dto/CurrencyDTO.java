@@ -1,4 +1,4 @@
-package pl.konradchrzanowski.currencies.service.dto;
+package pl.konradchrzanowski.currencies.service.client.dto;
 
 import lombok.Builder;
 import lombok.Data;
