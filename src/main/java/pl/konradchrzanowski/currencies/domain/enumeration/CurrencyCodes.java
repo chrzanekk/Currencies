@@ -1,5 +1,10 @@
 package pl.konradchrzanowski.currencies.domain.enumeration;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public enum CurrencyCodes {
     THB,
     USD,
@@ -35,5 +40,8 @@ public enum CurrencyCodes {
     KRW,
     CNY,
     XDR,
-    PLN
+    PLN;
+
+    public static final Set<String> values = Stream.of(Arrays.toString(values())).collect(Collectors.toSet());
+
 }

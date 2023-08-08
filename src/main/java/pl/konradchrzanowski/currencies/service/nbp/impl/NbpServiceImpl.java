@@ -1,5 +1,7 @@
 package pl.konradchrzanowski.currencies.service.nbp.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,10 +20,10 @@ import java.util.List;
 @Service
 public class NbpServiceImpl implements NbpService {
 
+    private final Logger log = LoggerFactory.getLogger(NbpServiceImpl.class);
+
     @Value("${currencies.baseApiUrl}")
     private String baseUrl;
-
-    private static final String JSON_FORMAT = "?format=json";
     private static final String EXCHANGE_TABLES_PATH = "exchangerates/tables/";
 
     private final WebClient webClient;
@@ -32,17 +34,16 @@ public class NbpServiceImpl implements NbpService {
 
     @Override
     public CurrencyValueResponse getCurrencyValue(String currencyCode, String table) {
+        log.debug("Request to get currency value for currency {} from table {}", currencyCode, table);
         List<RatesResponse> ratesResponseList = getRateResponsesList(currencyCode, table);
-        List<RateResponse> responses = getRateResponseList(ratesResponseList);
-        RateResponse result = filterResult(currencyCode, responses);
+        List<RateResponse> listOfRates = getRateResponseList(ratesResponseList);
+        RateResponse result = findRateByCurrencyCode(currencyCode, listOfRates);
         return CurrencyValueResponse.builder().value(new BigDecimal(result.getMid())).build();
     }
 
-    private RateResponse filterResult(String currencyCode, List<RateResponse> responses) {
-        RateResponse result =
-                responses.stream().filter(rateResponse -> rateResponse.getCode().equals(currencyCode.toUpperCase()))
-                        .findFirst().orElseThrow(() -> new IllegalArgumentException("Not found"));
-        return result;
+    private RateResponse findRateByCurrencyCode(String currencyCode, List<RateResponse> responses) {
+        return responses.stream().filter(rateResponse -> rateResponse.getCode().equals(currencyCode.toUpperCase()))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Rates not found"));
     }
 
     private List<RateResponse> getRateResponseList(List<RatesResponse> ratesResponseList) {

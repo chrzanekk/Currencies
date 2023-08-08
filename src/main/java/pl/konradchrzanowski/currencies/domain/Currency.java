@@ -1,6 +1,7 @@
 package pl.konradchrzanowski.currencies.domain;
 
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@FieldNameConstants
 @Table(name = "currencies_requests")
 public class Currency {
 
