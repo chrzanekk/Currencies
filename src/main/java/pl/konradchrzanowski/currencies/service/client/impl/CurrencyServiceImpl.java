@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.konradchrzanowski.currencies.domain.Currency;
-import pl.konradchrzanowski.currencies.domain.enumeration.CurrencyCodes;
+import pl.konradchrzanowski.currencies.domain.enumeration.CurrencyCodesAll;
+import pl.konradchrzanowski.currencies.domain.enumeration.CurrencyCodesTabelA;
+import pl.konradchrzanowski.currencies.exception.CurrencyMismatchException;
 import pl.konradchrzanowski.currencies.payload.CurrencyRequest;
 import pl.konradchrzanowski.currencies.payload.CurrencyValueResponse;
 import pl.konradchrzanowski.currencies.repository.CurrencyRepository;
@@ -41,8 +43,8 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public CurrencyValueResponse getCurrentCurrencyValue(CurrencyRequest request) {
-        boolean isCurrencyCodeValid = isCurrencyCodeValid(request.getCurrency());
-        if (isCurrencyCodeValid) {
+        validateIsCurrencyCodeValid(request.getCurrency());
+        validateIsCurrencyCodeIsInTableA(request.getCurrency());
             log.debug("Request to get current currency value.");
             CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), "A");
             CurrencyDTO requestToSave = CurrencyDTO.builder()
@@ -52,14 +54,19 @@ public class CurrencyServiceImpl implements CurrencyService {
                     .date(LocalDateTime.now()).build();
             currencyRepository.save(currencyMapper.toEntity(requestToSave));
             return result;
-        } else {
-            throw new IllegalArgumentException("Currency code is not valid");
-        }
     }
 
-    private boolean isCurrencyCodeValid(String currency) {
-        Set<String> currenciesCodes = CurrencyCodes.values;
-        return currenciesCodes.contains(currency);
+    private void validateIsCurrencyCodeIsInTableA(String currency) {
+        Set<String> currenciesCodes = CurrencyCodesTabelA.values;
+        if(!currenciesCodes.contains(currency)) {
+            throw new CurrencyMismatchException("Currency " + currency + " is not from table A");
+        }
+    }
+    private void validateIsCurrencyCodeValid(String currency) {
+        Set<String> currenciesCodes = CurrencyCodesAll.values;
+        if(!currenciesCodes.contains(currency)) {
+            throw new CurrencyMismatchException("Currency " + currency + " is not official currency code.");
+        }
     }
 
     @Override
