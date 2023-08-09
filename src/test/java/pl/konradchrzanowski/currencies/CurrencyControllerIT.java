@@ -97,9 +97,6 @@ public class CurrencyControllerIT {
                 .currency(TO_SHORT_PATTERN_CURRENCY_CODE)
                 .name(FIRST_NAME).build();
 
-        CurrencyValueResponse expectedResponse = CurrencyValueResponse.builder().value(new BigDecimal("4.45")).build();
-
-        given(nbpService.getCurrencyValue(TO_SHORT_PATTERN_CURRENCY_CODE, "A")).willReturn(expectedResponse);
 
         restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,9 +114,6 @@ public class CurrencyControllerIT {
                 .currency(TO_LONG_PATTERN_CURRENCY_CODE)
                 .name(FIRST_NAME).build();
 
-        CurrencyValueResponse expectedResponse = CurrencyValueResponse.builder().value(new BigDecimal("4.45")).build();
-
-        given(nbpService.getCurrencyValue(TO_LONG_PATTERN_CURRENCY_CODE, "A")).willReturn(expectedResponse);
 
         restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,9 +131,37 @@ public class CurrencyControllerIT {
                 .currency(WITH_DIGIT_PATTERN_CURRENCY_CODE)
                 .name(FIRST_NAME).build();
 
-        CurrencyValueResponse expectedResponse = CurrencyValueResponse.builder().value(new BigDecimal("4.45")).build();
+        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
 
-        given(nbpService.getCurrencyValue(WITH_DIGIT_PATTERN_CURRENCY_CODE, "A")).willReturn(expectedResponse);
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }
+    @Test
+    public void shouldThrowExceptionForIncorrectCurrencyCode() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency(BAD_CURRENCY_CODE)
+                .name(FIRST_NAME).build();
+
+        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
+
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }
+    @Test
+    public void shouldThrowExceptionForEmptyCurrencyCode() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency(BAD_CURRENCY_CODE)
+                .name(FIRST_NAME).build();
 
         restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
