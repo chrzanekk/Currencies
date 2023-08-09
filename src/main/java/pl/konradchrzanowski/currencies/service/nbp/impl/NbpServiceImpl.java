@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import pl.konradchrzanowski.currencies.exception.RatesNotFoundException;
 import pl.konradchrzanowski.currencies.payload.CurrencyValueResponse;
 import pl.konradchrzanowski.currencies.payload.RateResponse;
 import pl.konradchrzanowski.currencies.payload.RatesResponse;
@@ -20,11 +21,12 @@ import java.util.List;
 @Service
 public class NbpServiceImpl implements NbpService {
 
+    public static final String RATES_NOT_FOUND = "Rates not found";
+    private static final String EXCHANGE_TABLES_PATH = "exchangerates/tables/";
     private final Logger log = LoggerFactory.getLogger(NbpServiceImpl.class);
 
     @Value("${currencies.baseApiUrl}")
     private String baseUrl;
-    private static final String EXCHANGE_TABLES_PATH = "exchangerates/tables/";
 
     private final WebClient webClient;
 
@@ -43,12 +45,12 @@ public class NbpServiceImpl implements NbpService {
 
     private RateResponse findRateByCurrencyCode(String currencyCode, List<RateResponse> responses) {
         return responses.stream().filter(rateResponse -> rateResponse.getCode().equals(currencyCode.toUpperCase()))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Rates not found"));
+                .findFirst().orElseThrow(() -> new RatesNotFoundException(RATES_NOT_FOUND));
     }
 
     private List<RateResponse> getRateResponseList(List<RatesResponse> ratesResponseList) {
-        RatesResponse first = ratesResponseList.stream().findFirst().orElseThrow(() -> new IllegalArgumentException(
-                "Not found"));
+        RatesResponse first = ratesResponseList.stream().findFirst().orElseThrow(() -> new RatesNotFoundException(
+                RATES_NOT_FOUND));
         return first.getRates();
     }
 
