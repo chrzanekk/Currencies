@@ -1,7 +1,6 @@
 package pl.konradchrzanowski.currencies.domain.enumeration;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -186,6 +185,6 @@ public enum CurrencyCodesAll {
     ZAR,
     ZMW,
     ZWL;
-
-    public static final Set<String> values = Stream.of(Arrays.toString(values())).collect(Collectors.toSet());
+    public static final List<String> codes =
+            Stream.of(CurrencyCodesAll.values()).map(CurrencyCodesAll::name).collect(Collectors.toList());
 }

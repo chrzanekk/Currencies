@@ -1,6 +1,7 @@
 package pl.konradchrzanowski.currencies.domain.enumeration;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,6 +43,9 @@ public enum CurrencyCodesTabelA {
     XDR,
     PLN;
 
-    public static final Set<String> values = Stream.of(Arrays.toString(values())).collect(Collectors.toSet());
+    public static final List<String> codes =
+            Stream.of(CurrencyCodesTabelA.values()).map(CurrencyCodesTabelA::name).collect(Collectors.toList());
+
+
 
 }

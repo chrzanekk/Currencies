@@ -23,5 +23,3 @@ spring:
       settings.trace: false
       settings.web-allow-others: false
 
-currencies:
-  baseApiUrl: "http://api.nbp.pl/api/"

@@ -22,12 +22,13 @@ import pl.konradchrzanowski.currencies.service.nbp.NbpService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Service
 @Transactional
 public class CurrencyServiceImpl implements CurrencyService {
 
+    public static final int CORRECT_CURRENCY_CODE_LENGTH = 3;
     private final NbpService nbpService;
     private final CurrencyRepository currencyRepository;
     private final CurrencyMapper currencyMapper;
@@ -43,30 +44,63 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public CurrencyValueResponse getCurrentCurrencyValue(CurrencyRequest request) {
+        validateIsCurrencyCodeHasCorrectPattern(request.getCurrency());
         validateIsCurrencyCodeValid(request.getCurrency());
         validateIsCurrencyCodeIsInTableA(request.getCurrency());
-            log.debug("Request to get current currency value.");
-            CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), "A");
-            CurrencyDTO requestToSave = CurrencyDTO.builder()
-                    .name(request.getName())
-                    .currency(request.getCurrency())
-                    .value(result.getValue())
-                    .date(LocalDateTime.now()).build();
-            currencyRepository.save(currencyMapper.toEntity(requestToSave));
-            return result;
+        log.debug("Request to get current currency value.");
+        CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), "A");
+        CurrencyDTO requestToSave = CurrencyDTO.builder()
+                .name(request.getName())
+                .currency(request.getCurrency())
+                .value(result.getValue())
+                .date(LocalDateTime.now()).build();
+        currencyRepository.save(currencyMapper.toEntity(requestToSave));
+        return result;
     }
 
-    private void validateIsCurrencyCodeIsInTableA(String currency) {
-        Set<String> currenciesCodes = CurrencyCodesTabelA.values;
-        if(!currenciesCodes.contains(currency)) {
-            throw new CurrencyMismatchException("Currency " + currency + " is not from table A");
+    private void validateIsCurrencyCodeIsInTableA(String currencyCode) {
+        List<String> currenciesCodes = CurrencyCodesTabelA.codes;
+        if (!currenciesCodes.contains(currencyCode)) {
+            throw new CurrencyMismatchException("Currency " + currencyCode + " is not from table A");
         }
     }
-    private void validateIsCurrencyCodeValid(String currency) {
-        Set<String> currenciesCodes = CurrencyCodesAll.values;
-        if(!currenciesCodes.contains(currency)) {
-            throw new CurrencyMismatchException("Currency " + currency + " is not official currency code.");
+
+    private void validateIsCurrencyCodeValid(String currencyCode) {
+        List<String> currenciesCodes = CurrencyCodesAll.codes;
+        if (!currenciesCodes.contains(currencyCode)) {
+            throw new CurrencyMismatchException("Currency " + currencyCode + " is not official currency code.");
         }
+    }
+
+    private void validateIsCurrencyCodeHasCorrectPattern(String currencyCode) {
+        if (isCurrencyCodeNotMatchToRequirements(currencyCode)) {
+            throw new CurrencyMismatchException("Currency " + currencyCode + "is not valid currency code");
+        }
+    }
+
+    private static boolean isCurrencyCodeNotMatchToRequirements(String currencyCode) {
+        return currencyCode == null
+                || currencyCode.isEmpty()
+                || isCurrencyCodeContainsAnyDigit(currencyCode)
+                || isSizeLowerThanValidCodeLength(currencyCode)
+                || isSizeHigherThanValidCodeLength(currencyCode);
+    }
+
+    private static boolean isSizeHigherThanValidCodeLength(String currencyCode) {
+        return currencyCode.length() > CORRECT_CURRENCY_CODE_LENGTH;
+    }
+
+    private static boolean isSizeLowerThanValidCodeLength(String currencyCode) {
+        return currencyCode.length() < CORRECT_CURRENCY_CODE_LENGTH;
+    }
+
+    private static boolean isCurrencyCodeContainsAnyDigit(String currencyCode) {
+        for (int i = 0; i < currencyCode.length(); i++) {
+            if (Character.isDigit(currencyCode.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
