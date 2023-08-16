@@ -190,8 +190,26 @@ public class CurrencyControllerIT {
         defaultSavedRequestShouldBeFound("name=" + DEFAULT_NAME);
 
         defaultSavedRequestShouldNotBeFound("name=" + WRONG_NAME);
-
     }
+    @Test
+    @Transactional
+    public void shouldCheckIfNameStartSubstringFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("name=" + DEFAULT_NAME.substring(0,3));
+
+        defaultSavedRequestShouldNotBeFound("name=" + WRONG_NAME.substring(0,3));
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfNameEndSubstringFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("name=" + DEFAULT_NAME.substring(2,6));
+
+        defaultSavedRequestShouldNotBeFound("name=" + WRONG_NAME.substring(2,6));
+    }
+
     @Test
     @Transactional
     public void shouldCheckIfCurrencyFilterWorksWell() throws Exception {
@@ -200,7 +218,33 @@ public class CurrencyControllerIT {
         defaultSavedRequestShouldBeFound("currency=" + GOOD_CURRENCY_CODE);
 
         defaultSavedRequestShouldNotBeFound("currency=" + BAD_CURRENCY_CODE);
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfCurrencyFirstCharAtFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
 
+        defaultSavedRequestShouldBeFound("currency=" + GOOD_CURRENCY_CODE.charAt(0));
+
+        defaultSavedRequestShouldNotBeFound("currency=" + BAD_CURRENCY_CODE.charAt(0));
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfCurrencyMiddleCharAtFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("currency=" + GOOD_CURRENCY_CODE.charAt(1));
+
+        defaultSavedRequestShouldNotBeFound("currency=" + BAD_CURRENCY_CODE.charAt(1));
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfCurrencyEndCharAtFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("currency=" + GOOD_CURRENCY_CODE.charAt(2));
+
+        defaultSavedRequestShouldNotBeFound("currency=" + BAD_CURRENCY_CODE.charAt(2));
     }
     @Test
     @Transactional
