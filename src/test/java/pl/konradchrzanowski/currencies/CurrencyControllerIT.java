@@ -14,33 +14,42 @@ import pl.konradchrzanowski.currencies.domain.Currency;
 import pl.konradchrzanowski.currencies.payload.CurrencyRequest;
 import pl.konradchrzanowski.currencies.payload.CurrencyValueResponse;
 import pl.konradchrzanowski.currencies.repository.CurrencyRepository;
+import pl.konradchrzanowski.currencies.service.client.dto.CurrencyDTO;
 import pl.konradchrzanowski.currencies.service.client.mapper.CurrencyMapper;
 import pl.konradchrzanowski.currencies.service.nbp.NbpService;
 import pl.konradchrzanowski.currencies.util.TestUtil;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = CurrenciesApplication.class)
-//@WebMvcTest(CurrencyController.class)
-//@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 public class CurrencyControllerIT {
 
-    private static final String FIRST_NAME = "first name";
+    private static final String DEFAULT_NAME = "first name";
+    private static final String WRONG_NAME = "wrong name";
     private static final String GOOD_CURRENCY_CODE = "PLN";
     private static final String BAD_CURRENCY_CODE = "AAA";
     private static final String TO_SHORT_PATTERN_CURRENCY_CODE = "AA";
     private static final String TO_LONG_PATTERN_CURRENCY_CODE = "AAAA";
     private static final String WITH_DIGIT_PATTERN_CURRENCY_CODE = "1AA";
 
-    private static final String API_PATCH = "/currencies";
+    private static final BigDecimal DEFAULT_VALUE_RESPONSE = new BigDecimal("4.45");
+    private static final BigDecimal WRONG_VALUE_RESPONSE = new BigDecimal("6.45");
+    private static final LocalDateTime DEFAULT_REQUEST_DATE_TIME = LocalDateTime.parse("2023-08-15T12:22");
+    private static final LocalDateTime DEFAULT_REQUEST_DATE_TIME_END = LocalDateTime.parse("2023-08-16T12:22");
+    private static final LocalDateTime WRONG_REQUEST_DATE_TIME_START = LocalDateTime.parse("2023-08-11T12:22");
+    private static final LocalDateTime WRONG_REQUEST_DATE_TIME_END = LocalDateTime.parse("2023-08-14T12:22");
+    private static final String API_PATH = "/currencies";
 
     @Autowired
     private CurrencyRepository currencyRepository;
@@ -70,13 +79,13 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(GOOD_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
-        CurrencyValueResponse expectedResponse = CurrencyValueResponse.builder().value(new BigDecimal("4.45")).build();
+        CurrencyValueResponse expectedResponse = CurrencyValueResponse.builder().value(DEFAULT_VALUE_RESPONSE).build();
 
         given(nbpService.getCurrencyValue(GOOD_CURRENCY_CODE, "A")).willReturn(expectedResponse);
 
-        MvcResult result = restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        MvcResult result = restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isOk()).andReturn();
@@ -95,10 +104,10 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(TO_SHORT_PATTERN_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
 
-        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isBadRequest());
@@ -112,10 +121,10 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(TO_LONG_PATTERN_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
 
-        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isBadRequest());
@@ -129,9 +138,9 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(WITH_DIGIT_PATTERN_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
-        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isBadRequest());
@@ -145,9 +154,9 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(BAD_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
-        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isBadRequest());
@@ -161,9 +170,9 @@ public class CurrencyControllerIT {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(BAD_CURRENCY_CODE)
-                .name(FIRST_NAME).build();
+                .name(DEFAULT_NAME).build();
 
-        restCurrencyMockMvc.perform(post(API_PATCH + "/get-current-currency-value-command")
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(TestUtil.convertObjectToJsonBytes(request)))
                 .andExpect(status().isBadRequest());
@@ -171,6 +180,76 @@ public class CurrencyControllerIT {
 
         List<Currency> currencyList = currencyRepository.findAll();
         assertThat(currencyList.size()).isEqualTo(0);
+    }
+
+    @Test
+    @Transactional
+    public void shouldCheckIfNameFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("name=" + DEFAULT_NAME);
+
+        defaultSavedRequestShouldNotBeFound("name=" + WRONG_NAME);
+
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfCurrencyFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("currency=" + GOOD_CURRENCY_CODE);
+
+        defaultSavedRequestShouldNotBeFound("currency=" + BAD_CURRENCY_CODE);
+
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfValueFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("valueStartsWith=" + DEFAULT_VALUE_RESPONSE + "&valueEndsWith=" + DEFAULT_VALUE_RESPONSE.add(BigDecimal.ONE));
+
+        defaultSavedRequestShouldNotBeFound("valueStartsWith=" + WRONG_VALUE_RESPONSE + "&valueEndsWith=" + WRONG_VALUE_RESPONSE.add(BigDecimal.ONE));
+
+    }
+    @Test
+    @Transactional
+    public void shouldCheckIfDateFilterWorksWell() throws Exception {
+        currency = createDefaultSavedRequest();
+
+        defaultSavedRequestShouldBeFound("dateStartsWith=" + DEFAULT_REQUEST_DATE_TIME + "&dateEndsWith=" + DEFAULT_REQUEST_DATE_TIME_END);
+
+        defaultSavedRequestShouldNotBeFound("dateStartsWith=" + WRONG_REQUEST_DATE_TIME_START + "&dateEndsWith=" + WRONG_REQUEST_DATE_TIME_END);
+
+    }
+
+
+    private void defaultSavedRequestShouldBeFound(String filter) throws Exception {
+        restCurrencyMockMvc.perform(get(API_PATH + "/requests/?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
+                .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+                .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE_RESPONSE.doubleValue())))
+                .andExpect(jsonPath("$.[*].currency").value(hasItem(GOOD_CURRENCY_CODE)))
+                .andExpect(jsonPath("$.[*].date").value(hasItem(DEFAULT_REQUEST_DATE_TIME.toString()))).andReturn();
+    }
+
+    private void defaultSavedRequestShouldNotBeFound(String filter) throws Exception {
+        restCurrencyMockMvc.perform(get(API_PATH + "/requests/?sort=id,desc&" + filter))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    private Currency createDefaultSavedRequest() {
+        CurrencyDTO currencyDTO = CurrencyDTO.builder()
+                .currency(GOOD_CURRENCY_CODE)
+                .name(DEFAULT_NAME)
+                .value(DEFAULT_VALUE_RESPONSE)
+                .date(DEFAULT_REQUEST_DATE_TIME).build();
+        return currencyRepository.save(currencyMapper.toEntity(currencyDTO));
     }
 
 }

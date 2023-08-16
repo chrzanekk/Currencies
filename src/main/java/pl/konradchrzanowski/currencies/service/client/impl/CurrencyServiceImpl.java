@@ -44,9 +44,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public CurrencyValueResponse getCurrentCurrencyValue(CurrencyRequest request) {
-        validateIsCurrencyCodeHasCorrectPattern(request.getCurrency());
-        validateIsCurrencyCodeValid(request.getCurrency());
-        validateIsCurrencyCodeIsInTableA(request.getCurrency());
+        validateIsCurrencyCodeHasCorrectPattern(request.getCurrency().toUpperCase());
+        validateIsCurrencyCodeValid(request.getCurrency().toUpperCase());
+        validateIsCurrencyCodeIsInTableA(request.getCurrency().toUpperCase());
         log.debug("Request to get current currency value.");
         CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), "A");
         CurrencyDTO requestToSave = CurrencyDTO.builder()
@@ -73,7 +73,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     private void validateIsCurrencyCodeHasCorrectPattern(String currencyCode) {
-        if (isCurrencyCodeNotMatchToRequirements(currencyCode)) {
+        if (isCurrencyCodeNotMatchToRequirements(currencyCode.toUpperCase())) {
             throw new CurrencyMismatchException("Currency " + currencyCode + "is not valid currency code");
         }
     }
