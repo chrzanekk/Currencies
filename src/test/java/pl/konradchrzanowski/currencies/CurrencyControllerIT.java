@@ -117,10 +117,77 @@ public class CurrencyControllerIT {
         assertThat(currencyList.size()).isEqualTo(0);
     }
     @Test
+    public void shouldThrowExceptionForEmptyName() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency(TO_SHORT_PATTERN_CURRENCY_CODE)
+                .name("").build();
+
+
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
+
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }
+    @Test
+    public void shouldThrowExceptionWhenNameIsNull() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency(TO_SHORT_PATTERN_CURRENCY_CODE)
+                .name(null).build();
+
+
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
+
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }
+    @Test
     public void shouldThrowExceptionForToLongCurrencyCodePattern() throws Exception {
 
         CurrencyRequest request = CurrencyRequest.builder()
                 .currency(TO_LONG_PATTERN_CURRENCY_CODE)
+                .name(DEFAULT_NAME).build();
+
+
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
+
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }
+    @Test
+    public void shouldThrowExceptionWhenCurrencyIsNull() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency(null)
+                .name(DEFAULT_NAME).build();
+
+
+        restCurrencyMockMvc.perform(post(API_PATH + "/get-current-currency-value-command")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(TestUtil.convertObjectToJsonBytes(request)))
+                .andExpect(status().isBadRequest());
+
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList.size()).isEqualTo(0);
+    }    @Test
+    public void shouldThrowExceptionWhenCurrencyIsEmpty() throws Exception {
+
+        CurrencyRequest request = CurrencyRequest.builder()
+                .currency("")
                 .name(DEFAULT_NAME).build();
 
 

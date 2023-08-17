@@ -10,6 +10,8 @@ import pl.konradchrzanowski.currencies.domain.Currency;
 import pl.konradchrzanowski.currencies.domain.enumeration.CurrencyCodesAll;
 import pl.konradchrzanowski.currencies.domain.enumeration.CurrencyCodesTabelA;
 import pl.konradchrzanowski.currencies.exception.CurrencyMismatchException;
+import pl.konradchrzanowski.currencies.exception.NameNotExistsException;
+import pl.konradchrzanowski.currencies.exception.constant.ErrorMessages;
 import pl.konradchrzanowski.currencies.payload.CurrencyRequest;
 import pl.konradchrzanowski.currencies.payload.CurrencyValueResponse;
 import pl.konradchrzanowski.currencies.repository.CurrencyRepository;
@@ -29,6 +31,8 @@ import java.util.List;
 public class CurrencyServiceImpl implements CurrencyService {
 
     public static final int CORRECT_CURRENCY_CODE_LENGTH = 3;
+    private static final String DEFAULT_CURRENCY_TABLE = "A";
+
     private final NbpService nbpService;
     private final CurrencyRepository currencyRepository;
     private final CurrencyMapper currencyMapper;
@@ -44,11 +48,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public CurrencyValueResponse getCurrentCurrencyValue(CurrencyRequest request) {
-        validateIsCurrencyCodeHasCorrectPattern(request.getCurrency().toUpperCase());
-        validateIsCurrencyCodeValid(request.getCurrency().toUpperCase());
-        validateIsCurrencyCodeIsInTableA(request.getCurrency().toUpperCase());
         log.debug("Request to get current currency value.");
-        CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), "A");
+        validateCurrencyRequest(request);
+        CurrencyValueResponse result = nbpService.getCurrencyValue(request.getCurrency(), DEFAULT_CURRENCY_TABLE);
         CurrencyDTO requestToSave = CurrencyDTO.builder()
                 .name(request.getName())
                 .currency(request.getCurrency())
@@ -58,27 +60,41 @@ public class CurrencyServiceImpl implements CurrencyService {
         return result;
     }
 
+    private void validateCurrencyRequest(CurrencyRequest request) {
+        validateIsNameIsPresent(request.getName());
+        validateIsCurrencyCodeHasCorrectPattern(request);
+        validateIsCurrencyCodeValid(request.getCurrency().toUpperCase());
+        validateIsCurrencyCodeIsInTableA(request.getCurrency().toUpperCase());
+    }
+
+    private void validateIsNameIsPresent(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new NameNotExistsException(ErrorMessages.NAME_NOT_EXISTS);
+        }
+    }
+
     private void validateIsCurrencyCodeIsInTableA(String currencyCode) {
         List<String> currenciesCodes = CurrencyCodesTabelA.codes;
         if (!currenciesCodes.contains(currencyCode)) {
-            throw new CurrencyMismatchException("Currency " + currencyCode + " is not from table A");
+            throw new CurrencyMismatchException(ErrorMessages.CURRENCY_CODE_IS_NOT_FROM_TABLE_A);
         }
     }
 
     private void validateIsCurrencyCodeValid(String currencyCode) {
         List<String> currenciesCodes = CurrencyCodesAll.codes;
         if (!currenciesCodes.contains(currencyCode)) {
-            throw new CurrencyMismatchException("Currency " + currencyCode + " is not official currency code.");
+            throw new CurrencyMismatchException(ErrorMessages.CURRENCY_CODE_IS_OFFICIAL);
         }
     }
 
-    private void validateIsCurrencyCodeHasCorrectPattern(String currencyCode) {
-        if (isCurrencyCodeNotMatchToRequirements(currencyCode.toUpperCase())) {
-            throw new CurrencyMismatchException("Currency " + currencyCode + "is not valid currency code");
+    private void validateIsCurrencyCodeHasCorrectPattern(CurrencyRequest request) {
+        if (isCurrencyCodeNotMatchToRequirements(request)) {
+            throw new CurrencyMismatchException(ErrorMessages.CURRENCY_CODE_IS_NOT_VALID);
         }
     }
 
-    private static boolean isCurrencyCodeNotMatchToRequirements(String currencyCode) {
+    private static boolean isCurrencyCodeNotMatchToRequirements(CurrencyRequest request) {
+        String currencyCode = request.getCurrency();
         return currencyCode == null
                 || currencyCode.isEmpty()
                 || isCurrencyCodeContainsAnyDigit(currencyCode)

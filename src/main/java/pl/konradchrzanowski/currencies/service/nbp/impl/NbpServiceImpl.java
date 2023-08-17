@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.konradchrzanowski.currencies.exception.RatesNotFoundException;
+import pl.konradchrzanowski.currencies.exception.constant.ErrorMessages;
 import pl.konradchrzanowski.currencies.payload.CurrencyValueResponse;
 import pl.konradchrzanowski.currencies.payload.RateResponse;
 import pl.konradchrzanowski.currencies.payload.RatesResponse;
@@ -17,11 +18,12 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class NbpServiceImpl implements NbpService {
 
-    public static final String RATES_NOT_FOUND = "Rates not found";
+    private static final String DEFAULT_CURRENCY_TABLE = "A";
     private static final String EXCHANGE_TABLES_PATH = "exchangerates/tables/";
     private final Logger log = LoggerFactory.getLogger(NbpServiceImpl.class);
 
@@ -45,12 +47,12 @@ public class NbpServiceImpl implements NbpService {
 
     private RateResponse findRateByCurrencyCode(String currencyCode, List<RateResponse> responses) {
         return responses.stream().filter(rateResponse -> rateResponse.getCode().equals(currencyCode.toUpperCase()))
-                .findFirst().orElseThrow(() -> new RatesNotFoundException(RATES_NOT_FOUND));
+                .findFirst().orElseThrow(() -> new RatesNotFoundException(ErrorMessages.RATES_NOT_FOUND));
     }
 
     private List<RateResponse> getRateResponseList(List<RatesResponse> ratesResponseList) {
         RatesResponse first = ratesResponseList.stream().findFirst().orElseThrow(() -> new RatesNotFoundException(
-                RATES_NOT_FOUND));
+                ErrorMessages.RATES_NOT_FOUND));
         return first.getRates();
     }
 
@@ -65,16 +67,12 @@ public class NbpServiceImpl implements NbpService {
 
     private RatesResponse[] getRatesResponses(String currencyCode, String table) {
         return webClient.get()
-                .uri(uriCreator(table))
+                .uri(uriCreatorForCurrencyTables(table))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve().bodyToMono(RatesResponse[].class).block();
     }
 
-    private String uriCreator(String table) {
-        if (table != null) {
-            return baseUrl + EXCHANGE_TABLES_PATH + table + "/";
-        } else {
-            return baseUrl + EXCHANGE_TABLES_PATH + "A/";
-        }
+    private String uriCreatorForCurrencyTables(String table) {
+        return baseUrl + EXCHANGE_TABLES_PATH + Objects.requireNonNullElse(table, DEFAULT_CURRENCY_TABLE) + "/";
     }
 }
