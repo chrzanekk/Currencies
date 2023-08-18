@@ -1,14 +1,21 @@
 package pl.konradchrzanowski.currencies.domain;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@FieldNameConstants
+@Table(name = "currencies_requests")
 public class Currency {
 
     @Id
@@ -16,18 +23,17 @@ public class Currency {
     private Long id;
 
     @Column(name = "name")
-    @NotNull
     private String name;
 
-    @Column(name = "currency")
-    @NotNull
+    @Column(name = "currency_code")
     private String currency;
 
     @Column(name = "request_date")
-    LocalDateTime date;
+    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime date;
 
-    @Column(name = "value")
-    @NotNull
-    BigDecimal value;
+    @Column(name = "currency_value")
+    private BigDecimal value;
 
 }

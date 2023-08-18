@@ -1,4 +1,4 @@
-package pl.konradchrzanowski.currencies.service.mapper;
+package pl.konradchrzanowski.currencies.service.client.mapper;
 
 import java.util.List;
 

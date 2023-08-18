@@ -1,8 +1,8 @@
-package pl.konradchrzanowski.currencies.service.mapper;
+package pl.konradchrzanowski.currencies.service.client.mapper;
 
 import org.mapstruct.Mapper;
 import pl.konradchrzanowski.currencies.domain.Currency;
-import pl.konradchrzanowski.currencies.service.dto.CurrencyDTO;
+import pl.konradchrzanowski.currencies.service.client.dto.CurrencyDTO;
 
 @Mapper(componentModel = "spring", uses = {})
 public interface CurrencyMapper extends EntityMapper<CurrencyDTO, Currency> {
