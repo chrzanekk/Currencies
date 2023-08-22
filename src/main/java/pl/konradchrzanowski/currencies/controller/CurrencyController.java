@@ -3,7 +3,6 @@ package pl.konradchrzanowski.currencies.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -37,16 +36,13 @@ public class CurrencyController {
         CurrencyValueResponse response = currencyService.getCurrentCurrencyValue(currencyRequest);
         return ResponseEntity.ok(response);
     }
-
-
+//todo change test for getMapping - add pegable to params
     @GetMapping(path = "/requests")
     public ResponseEntity<List<CurrencyDTO>> getAllRequests(
-            CurrencyFilter currencyFiler,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size) {
+            CurrencyFilter currencyFiler, Pageable pageable) {
         log.debug("REST get all saved currencies requests");
 
-        Pageable pageable = PageRequest.of(page, size);
+
         Page<CurrencyDTO> result = currencyService.getAllSavedRequests(currencyFiler, pageable);
         HttpHeaders headers =
                 PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), result);
