@@ -1,1 +1,61 @@
-<p>currency-request works!</p>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="submit-form col-md-5">
+      <div class="card">
+        <div class="card-header">Stwórz zapytanie o walute</div>
+        <div class="card-body">
+          <form name="form" role="form" (ngSubmit)="createRequest()" [formGroup]="requestForm">
+
+            <div class="form-group">
+              <label class="form-control-label" for="name">Imię i nazwisko</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                formControlName="name"
+                placeholder="Podaj imię i nazwisko"
+                [ngClass]="{'is-invalid': submitted && f['name'].errors}"/>
+              <div *ngIf="submitted && f['username'].errors" class="invalid-feedback">
+                <div *ngIf="f['name'].errors['required']">Imię i nazwisko jest wymagane</div>
+                <div *ngIf="f['name'].errors['minlength']">
+                  Imię i nazwisko musi mieć długość przynajmniej 4 znaki.
+                </div>
+                <div *ngIf="f['name'].errors['maxlength']">
+                  Imię i nazwisko nie może mieć więcej niż 20 znaków.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-control-label" for="currency">Kod waluty</label>
+              <input
+                type="text"
+                class="form-control"
+                id="currency"
+                name="currency"
+                formControlName="currency"
+                placeholder="Podaj trzyliterowy kod waluty"
+                [ngClass]="{'is-invalid': submitted && f['currency'].errors}"/>
+              <div *ngIf="submitted && f['currency'].errors" class="invalid-feedback">
+                <div *ngIf="f['currency'].errors['required']">Kod waluty jest wymagany</div>
+                <div *ngIf="f['currency'].errors['minlength']">
+                  Kod waluty nie może być krótszy niż 3 znaki.
+                </div>
+                <div *ngIf="f['currency'].errors['maxlength']">
+                  Kod waluty nie może być dłuższy niż 3 znaki.
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Wyślij</button>
+            <button type="button" class="btn btn-warning float-right" (click)="newRequest()">Nowe żądanie</button>
+          </form>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+

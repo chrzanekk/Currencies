@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/currencies")
+@CrossOrigin(origins = "http://localhost:4200")
 public class CurrencyController {
 
     private final Logger log = LoggerFactory.getLogger(CurrencyController.class);
@@ -30,14 +31,14 @@ public class CurrencyController {
     }
 
 
-    @PostMapping(path = "/get-current-currency-value-command")
+    @PostMapping( "/get-current-currency-value-command")
     public ResponseEntity<CurrencyValueResponse> getCurrentCurrencyValue(@RequestBody CurrencyRequest currencyRequest) {
         log.debug("REST request to get current currency value: {}", currencyRequest.getCurrency());
         CurrencyValueResponse response = currencyService.getCurrentCurrencyValue(currencyRequest);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(response);
     }
 //todo change test for getMapping - add pegable to params
-    @GetMapping(path = "/requests")
+    @GetMapping("/requests")
     public ResponseEntity<List<CurrencyDTO>> getAllRequests(
             CurrencyFilter currencyFiler, Pageable pageable) {
         log.debug("REST get all saved currencies requests");

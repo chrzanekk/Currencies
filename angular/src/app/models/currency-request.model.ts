@@ -1,11 +1,12 @@
 export interface ICurrencyRequest {
-  name?: String;
-  currency?:String;
+  name?: string;
+  currency?: string;
 }
 
-export class CurrencyRequest implements ICurrencyRequest{
+export class CurrencyRequest implements ICurrencyRequest {
   constructor(
-    public name?: String,
-    public currency?:String
-  ) {}
+    public name?: string,
+    public currency?: string
+  ) {
+  }
 }
