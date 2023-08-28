@@ -46,10 +46,10 @@ export class CurrencyRequestComponent implements OnInit {
 
       this.currencyService.createRequest(request).subscribe({
         next: (response) => {
-          alert("Żądanie wysłane poprawnie");
+          alert(response.value);
           this.submitted = true;
         },
-        error: (e) => alert("ERROR")
+        error: (e) => alert(e.error.message)
       });
     }
   }

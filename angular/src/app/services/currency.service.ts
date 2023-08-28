@@ -23,13 +23,12 @@ export class CurrencyService {
   constructor(private http: HttpClient) { }
 
   createRequest(request :ICurrencyRequest): Observable<CurrencyValueResponse> {
-
-    return this.http.post<ICurrencyValueResponse>(BASE_API_PATH + '/get-current-currency-value-command', request, httpOptions);
+    return this.http.post(`${BASE_API_PATH}/get-current-currency-value-command`, request, httpOptions);
   }
 
   getAllSavedRequest(request?: any): Observable<any> {
     const options = createRequestOption(request);
-    return this.http.get(BASE_API_PATH + '/requests', {params: options, observe: 'response'})
+    return this.http.get(`${BASE_API_PATH}/requests`, {params: options, observe: 'response'})
   }
 
   getSearchFields(): FiltrationField[] {

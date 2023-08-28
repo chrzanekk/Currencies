@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 @Data
 public class CurrencyRequest {
-    private final String currency;
-    private final String name;
+    private String currency;
+    private String name;
 }

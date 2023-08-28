@@ -16,7 +16,7 @@
                 formControlName="name"
                 placeholder="Podaj imię i nazwisko"
                 [ngClass]="{'is-invalid': submitted && f['name'].errors}"/>
-              <div *ngIf="submitted && f['username'].errors" class="invalid-feedback">
+              <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
                 <div *ngIf="f['name'].errors['required']">Imię i nazwisko jest wymagane</div>
                 <div *ngIf="f['name'].errors['minlength']">
                   Imię i nazwisko musi mieć długość przynajmniej 4 znaki.
