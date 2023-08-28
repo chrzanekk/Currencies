@@ -65,6 +65,13 @@ public class CurrencyServiceImpl implements CurrencyService {
         validateIsCurrencyCodeHasCorrectPattern(request);
         validateIsCurrencyCodeValid(request.getCurrency().toUpperCase());
         validateIsCurrencyCodeIsInTableA(request.getCurrency().toUpperCase());
+        validateIsCurrencyNotPLN(request.getCurrency().toUpperCase());
+    }
+
+    private void validateIsCurrencyNotPLN(String currencyCode) {
+        if(currencyCode.equals("PLN")) {
+            throw new CurrencyMismatchException(ErrorMessages.SAME_CURRENCY_CODE);
+        }
     }
 
     private void validateIsNameIsPresent(String name) {
