@@ -1,10 +1,11 @@
-import { Moment } from 'moment';
+import {Moment} from 'moment';
 
 export interface ICurrencyResponse {
   id?: number;
   name?: string;
   currency?: string;
-  date?: Moment;
+  value?: string;
+  date?: string;
 }
 
 export class CurrencyResponse implements ICurrencyResponse {
@@ -12,7 +13,8 @@ export class CurrencyResponse implements ICurrencyResponse {
     public id?: number,
     public name?: string,
     public currency?: string,
-    public date?: Moment
+    public value?: string,
+    public date?: string
   ) {
   }
 }

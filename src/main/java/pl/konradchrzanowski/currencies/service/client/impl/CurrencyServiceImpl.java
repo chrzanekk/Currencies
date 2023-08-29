@@ -127,9 +127,15 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Page<CurrencyDTO> getAllSavedRequests(CurrencyFilter currencyFilter, Pageable pageable) {
-        log.debug("Request to get all saved currencies requests.");
+    public Page<CurrencyDTO> getAllWithFilter(CurrencyFilter currencyFilter, Pageable pageable) {
+        log.debug("Request to get all saved currencies requests with filter.");
         Specification<Currency> specification = CurrencySpecification.createSpecification(currencyFilter);
         return currencyRepository.findAll(specification, pageable).map(currencyMapper::toDto);
+    }
+
+    @Override
+    public List<CurrencyDTO> getAll() {
+        log.debug("Request to get all saved currencies requests.");
+        return currencyMapper.toDto(currencyRepository.findAll());
     }
 }

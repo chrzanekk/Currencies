@@ -13,5 +13,6 @@ public interface CurrencyService {
 
     CurrencyValueResponse getCurrentCurrencyValue(CurrencyRequest request);
 
-    Page<CurrencyDTO> getAllSavedRequests(CurrencyFilter currencyFilter,Pageable pageable);
+    List<CurrencyDTO> getAll();
+    Page<CurrencyDTO> getAllWithFilter(CurrencyFilter currencyFilter, Pageable pageable);
 }

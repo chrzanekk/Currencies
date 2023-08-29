@@ -37,16 +37,25 @@ public class CurrencyController {
         CurrencyValueResponse response = currencyService.getCurrentCurrencyValue(currencyRequest);
         return ResponseEntity.ok().body(response);
     }
-//todo change test for getMapping - add pegable to params
+
     @GetMapping("/requests")
-    public ResponseEntity<List<CurrencyDTO>> getAllRequests(
+    public ResponseEntity<List<CurrencyDTO>> getAllRequests() {
+        log.debug("REST get all saved currencies requests.");
+        List<CurrencyDTO> result = currencyService.getAll();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/all-filtered")
+    public ResponseEntity<List<CurrencyDTO>> getAllRequestsWithFilter(
             CurrencyFilter currencyFiler, Pageable pageable) {
-        log.debug("REST get all saved currencies requests");
+        log.debug("REST get all saved currencies requests by filter {}", currencyFiler);
 
 
-        Page<CurrencyDTO> result = currencyService.getAllSavedRequests(currencyFiler, pageable);
+        Page<CurrencyDTO> result = currencyService.getAllWithFilter(currencyFiler, pageable);
         HttpHeaders headers =
                 PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), result);
         return ResponseEntity.ok().headers(headers).body(result.getContent());
     }
+
+
 }
