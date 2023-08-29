@@ -23,7 +23,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
                 .details(request.getDescription(false)).build();
-        log.debug("Error: ", e);
+        log.debug(e.getMessage(), e);
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .message(ex.getMessage())
                 .details(request.getDescription(false)).build();
-        log.debug("Error ", ex);
+        log.debug(ex.getMessage(), ex);
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

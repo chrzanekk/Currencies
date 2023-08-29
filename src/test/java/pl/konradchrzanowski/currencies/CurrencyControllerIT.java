@@ -37,7 +37,7 @@ public class CurrencyControllerIT {
 
     private static final String DEFAULT_NAME = "first name";
     private static final String WRONG_NAME = "wrong name";
-    private static final String GOOD_CURRENCY_CODE = "PLN";
+    private static final String GOOD_CURRENCY_CODE = "EUR";
     private static final String BAD_CURRENCY_CODE = "AAA";
     private static final String TO_SHORT_PATTERN_CURRENCY_CODE = "AA";
     private static final String TO_LONG_PATTERN_CURRENCY_CODE = "AAAA";
@@ -336,7 +336,7 @@ public class CurrencyControllerIT {
 
 
     private void defaultSavedRequestShouldBeFound(String filter) throws Exception {
-        restCurrencyMockMvc.perform(get(API_PATH + "/requests/?sort=id,desc&" + filter))
+        restCurrencyMockMvc.perform(get(API_PATH + "/all-filtered/?sort=id,desc&" + filter))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
@@ -347,7 +347,7 @@ public class CurrencyControllerIT {
     }
 
     private void defaultSavedRequestShouldNotBeFound(String filter) throws Exception {
-        restCurrencyMockMvc.perform(get(API_PATH + "/requests/?sort=id,desc&" + filter))
+        restCurrencyMockMvc.perform(get(API_PATH + "/all-filtered/?sort=id,desc&" + filter))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$").isArray())
